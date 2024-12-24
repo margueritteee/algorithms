@@ -1,72 +1,90 @@
 import random
 
-#Generate Random Population
-def generate_population(pop_size, chromosome_length):
-    population = []
-    for _ in range(pop_size):
-        chromosome = [random.randint(0, 1) for _ in range(chromosome_length)]
-        population.append(chromosome)
-    return population
+# Problem-specific data
+values = [20, 90, 140]  # Values of the items
+weights = [10, 25, 20]  # Weights of the items
+capacity = 50  # Knapsack capacity
 
-#Evaluation (for knapsack problem)
-def evaluate(chromosome, values, weights, capacity):
-    total_value = 0
-    total_weight = 0
-    for i in range(len(chromosome)):
-        if chromosome[i] == 1:
-            total_value += values[i]
-            total_weight += weights[i]
-    # Return 0 if weight exceeds capacity
-    return 0 if total_weight > capacity else total_value
+# Number of items
+n = len(values)
 
-#Selection (tournament selection)
-def selection(population, fitness_scores, tournament_size=2):
-    tournament = random.sample(list(enumerate(fitness_scores)), tournament_size)
-    winner = max(tournament, key=lambda x: x[1])[0]
-    return population[winner]
+# Parameters for the genetic algorithm
+population_size = 10
+generations = 100
+mutation_rate = 0.01
+crossover_rate = 0.7
 
-#Crossover (single-point)
+# Fitness function: Total value of items in the knapsack (if the weight is within the capacity)
+def fitness(solution):
+    total_weight = sum(solution[i] * weights[i] for i in range(n))
+    if total_weight > capacity:
+        return 0  # Penalty: if weight exceeds the capacity
+    total_value = sum(solution[i] * values[i] for i in range(n))
+    return total_value
+
+# Generate a random solution (individual)
+def random_solution():
+    return [random.randint(0, 1) for _ in range(n)]
+
+# Tournament selection (select two parents)
+def tournament_selection(population):
+    selected = random.sample(population, 3)
+    selected.sort(key=lambda x: fitness(x), reverse=True)
+    return selected[0], selected[1]
+
+# Crossover (single-point crossover)
 def crossover(parent1, parent2):
-    point = random.randint(1, len(parent1)-1)
-    child1 = parent1[:point] + parent2[point:]
-    child2 = parent2[:point] + parent1[point:]
+    if random.random() > crossover_rate:
+        return parent1[:], parent2[:]  # No crossover, return parents as is
+    crossover_point = random.randint(1, n-1)
+    child1 = parent1[:crossover_point] + parent2[crossover_point:]
+    child2 = parent2[:crossover_point] + parent1[crossover_point:]
     return child1, child2
 
-#Mutation
-def mutation(chromosome, mutation_rate=0.1):
-    mutated = chromosome.copy()
-    for i in range(len(mutated)):
-        if random.random() < mutation_rate:
-            mutated[i] = 1 - mutated[i]  # Flip bit
-    return mutated
+# Mutation (flip a random bit in the solution)
+def mutate(solution):
+    if random.random() > mutation_rate:
+        return solution
+    mutation_point = random.randint(0, n-1)
+    solution[mutation_point] = 1 - solution[mutation_point]  # Flip bit
+    return solution
 
-# Example usage:
-if __name__ == "__main__":
-    # Example parameters
-    pop_size = 4
-    chromosome_length = 5
-    values = [10, 20, 30, 40, 50]
-    weights = [5, 10, 15, 20, 25]
-    capacity = 30
+# Genetic Algorithm main loop
+def genetic_algorithm():
+    # Initialize population with random solutions
+    population = [random_solution() for _ in range(population_size)]
+    
+    for generation in range(generations):
+        # Evaluate fitness of the population
+        population.sort(key=lambda x: fitness(x), reverse=True)
+        
+        # If the best solution's fitness is optimal, break early
+        if fitness(population[0]) == sum(values):  # Can be adjusted based on the problem
+            print(f"Optimal solution found at generation {generation}")
+            break
+        
+        # Create the next generation
+        next_generation = []
+        while len(next_generation) < population_size:
+            # Select parents
+            parent1, parent2 = tournament_selection(population)
+            # Perform crossover to produce children
+            child1, child2 = crossover(parent1, parent2)
+            # Apply mutation
+            child1 = mutate(child1)
+            child2 = mutate(child2)
+            # Add children to next generation
+            next_generation.extend([child1, child2])
+        
+        # Replace the old population with the new generation
+        population = next_generation[:population_size]
+    
+    # Return the best solution
+    best_solution = population[0]
+    return best_solution, fitness(best_solution)
 
-    # Generate initial population
-    population = generate_population(pop_size, chromosome_length)
-    print("Initial population:", population)
+# Run the genetic algorithm
+best_solution, best_value = genetic_algorithm()
 
-    # Evaluate population
-    fitness_scores = [evaluate(chrom, values, weights, capacity) for chrom in population]
-    print("Fitness scores:", fitness_scores)
-
-    # Selection example
-    selected = selection(population, fitness_scores)
-    print("Selected chromosome:", selected)
-
-    # Crossover example
-    parent1 = population[0]
-    parent2 = population[1]
-    child1, child2 = crossover(parent1, parent2)
-    print("Children after crossover:", child1, child2)
-
-    # Mutation example
-    mutated = mutation(child1)
-    print("Chromosome after mutation:", mutated)
+print("Best solution:", best_solution)
+print("Total value:", best_value)
