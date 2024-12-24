@@ -1,0 +1,47 @@
+def generate_population(pop_size, chromosome_length):
+    population = []
+    for _ in range(pop_size):                     # O(pop_size)
+        chromosome = [random.randint(0, 1) for _ in range(chromosome_length)]  # O(chromosome_length)
+        population.append(chromosome)              # O(1) 
+
+#Complexity: O(pop_size × chromosome_length) 
+
+
+def evaluate(chromosome, values, weights, capacity):
+    total_value = 0
+    total_weight = 0
+    for i in range(len(chromosome)):              # O(n) where n is chromosome length
+        if chromosome[i] == 1:
+            total_value += values[i]              # O(1)
+            total_weight += weights[i]            # O(1)
+#Complexity: O(n) where n is chromosome length 
+
+
+def selection(population, fitness_scores, tournament_size):
+    tournament = random.sample(list(enumerate(fitness_scores)), tournament_size)  # O(tournament_size)
+    winner = max(tournament, key=lambda x: x[1])[0]                             # O(tournament_size) 
+
+#Complexity: O(tournament_size)
+
+
+def crossover(parent1, parent2):
+    point = random.randint(1, len(parent1)-1)     # O(1)
+    child1 = parent1[:point] + parent2[point:]    # O(n)
+    child2 = parent2[:point] + parent1[point:]    # O(n)
+#Complexity: O(n) where n is chromosome length
+
+def mutation(chromosome, mutation_rate):
+    mutated = chromosome.copy()                   # O(n)
+    for i in range(len(mutated)):                # O(n)
+        if random.random() < mutation_rate:
+            mutated[i] = 1 - mutated[i]          # O(1)
+
+#Complexity: O(n) where n is chromosome length
+
+
+Total Complexity: O(g × pop_size × n) where:
+
+g = number of generations
+pop_size = population size
+n = chromosome length
+
