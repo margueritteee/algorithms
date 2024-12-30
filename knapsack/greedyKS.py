@@ -27,7 +27,10 @@ def main():
 
     X = greedy_ks(W, P, n, W_max)
 
-    print("Solution X :", X)
+    total_value = sum(X[i] * P[i] for i in range(n)) #calcule total value
+    
+    print("Solution X:", X)
+    print("Total Value:", total_value)
 
 if __name__ == "__main__":
     main()
