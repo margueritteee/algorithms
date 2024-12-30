@@ -1,4 +1,3 @@
-# main.py
 from initialize import initialize_population
 from fitness import fitness_function
 from selection import selection
