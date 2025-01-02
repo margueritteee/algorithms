@@ -11,7 +11,7 @@ profits = [60, 100, 120, 240, 300]
 capacity = 100
 #les params
 pop_size = 20
-generations = 50
+generations = 5000
 mutation_rate = 0.1 
 
 def main():
