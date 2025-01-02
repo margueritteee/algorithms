@@ -1,4 +1,9 @@
-def fitness_function(chromosome, values, weights, max_weight):
-    total_value = sum(v for i, v in enumerate(values) if chromosome[i])
-    total_weight = sum(w for i, w in enumerate(weights) if chromosome[i])
-    return 0 if total_weight > max_weight else total_value
+def fitness(chromosome, weights, profits, capacity): #fun that calculate total weight and profit for a solution 
+    #chromosone:list of 0,1 (0 not included 1 it is )
+    #weights: list of weights d'objets , profits : list of profits d'objets , capacity:total weight de sac a dos
+    weight = sum(w * g for w, g in zip(weights, chromosome)) #calculate total weight of objects selected by chromosome 
+    #zip function in python it pairs each element with the other kima hna each weight with chromosome (selected wla wlo) w*g : ndrbo kol weight ema gen 
+    if weight > capacity:
+        return 0 #nverifier ida akbr tkhrj error 
+    return sum(p * g for p, g in zip(profits, chromosome)) #ida msh akbr nhsbo el profitis mtali
+
