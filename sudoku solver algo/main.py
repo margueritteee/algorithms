@@ -1,4 +1,3 @@
-#kezrane margueritte IAA (sudoku solver code using backtracking)
 #how sudoku works ? we verify each time if the number exists in (row-column-box) if not we add it , if yes we use backtracking and go back to re-verify (using backtracking)
 #complexity in the worst case (we try in each cell the numbers from 1 to 9 and we try all the cells 9x9=81) so its O(9^81)
 
